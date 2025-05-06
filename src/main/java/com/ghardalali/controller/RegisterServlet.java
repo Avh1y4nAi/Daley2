@@ -11,6 +11,8 @@ import jakarta.servlet.http.HttpSession;
 
 import com.ghardalali.model.User;
 import com.ghardalali.service.UserService;
+import com.ghardalali.util.SessionUtil;
+import com.ghardalali.util.ValidationUtil;
 
 /**
  * Servlet for handling user registration
@@ -29,11 +31,16 @@ public class RegisterServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         // Check if user is already logged in
-        HttpSession session = request.getSession(false);
-        if (session != null && session.getAttribute("user") != null) {
-            // User is already logged in, redirect to dashboard
-            response.sendRedirect(request.getContextPath() + "/dashboard");
+        if (SessionUtil.isLoggedIn(request)) {
+            // User is already logged in, redirect to profile
+            response.sendRedirect(request.getContextPath() + "/profile");
             return;
+        }
+
+        // Generate CSRF token for the form
+        HttpSession session = request.getSession(true);
+        if (session.getAttribute(SessionUtil.CSRF_TOKEN_ATTR) == null) {
+            session.setAttribute(SessionUtil.CSRF_TOKEN_ATTR, SessionUtil.generateCSRFToken());
         }
 
         // Forward to registration page
@@ -43,6 +50,15 @@ public class RegisterServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // Verify CSRF token
+        String csrfToken = request.getParameter("csrfToken");
+        if (!SessionUtil.isValidCSRFToken(request, csrfToken)) {
+            request.setAttribute("errorMessage", "Invalid request. Please try again.");
+            request.getRequestDispatcher("/register.jsp").forward(request, response);
+            return;
+        }
+
+        // Get form parameters
         String firstName = request.getParameter("firstName");
         String lastName = request.getParameter("lastName");
         String email = request.getParameter("email");
@@ -51,32 +67,44 @@ public class RegisterServlet extends HttpServlet {
         String confirmPassword = request.getParameter("confirmPassword");
         String termsAgreed = request.getParameter("termsAgreed");
 
+        // Sanitize inputs to prevent XSS
+        firstName = ValidationUtil.sanitizeInput(firstName);
+        lastName = ValidationUtil.sanitizeInput(lastName);
+        email = ValidationUtil.sanitizeInput(email);
+        contactNumber = ValidationUtil.sanitizeInput(contactNumber);
+
         // Validate input
         boolean hasError = false;
 
         // First name validation
-        if (firstName == null || firstName.trim().isEmpty()) {
+        if (ValidationUtil.isNullOrEmpty(firstName)) {
             request.setAttribute("firstNameError", "First name is required");
             hasError = true;
         } else if (firstName.length() > 50) {
             request.setAttribute("firstNameError", "First name cannot exceed 50 characters");
             hasError = true;
+        } else if (!ValidationUtil.isValidName(firstName)) {
+            request.setAttribute("firstNameError", "First name contains invalid characters");
+            hasError = true;
         }
 
         // Last name validation
-        if (lastName == null || lastName.trim().isEmpty()) {
+        if (ValidationUtil.isNullOrEmpty(lastName)) {
             request.setAttribute("lastNameError", "Last name is required");
             hasError = true;
         } else if (lastName.length() > 50) {
             request.setAttribute("lastNameError", "Last name cannot exceed 50 characters");
             hasError = true;
+        } else if (!ValidationUtil.isValidName(lastName)) {
+            request.setAttribute("lastNameError", "Last name contains invalid characters");
+            hasError = true;
         }
 
         // Email validation
-        if (email == null || email.trim().isEmpty()) {
+        if (ValidationUtil.isNullOrEmpty(email)) {
             request.setAttribute("emailError", "Email is required");
             hasError = true;
-        } else if (!email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+        } else if (!ValidationUtil.isValidEmail(email)) {
             request.setAttribute("emailError", "Please enter a valid email address");
             hasError = true;
         } else if (userService.isEmailExists(email)) {
@@ -86,31 +114,33 @@ public class RegisterServlet extends HttpServlet {
         }
 
         // Contact number validation
-        if (contactNumber == null || contactNumber.trim().isEmpty()) {
+        if (ValidationUtil.isNullOrEmpty(contactNumber)) {
             request.setAttribute("contactNumberError", "Contact number is required");
             hasError = true;
-        } else if (!contactNumber.matches("^[0-9]{10}$")) {
+        } else if (!ValidationUtil.isValidPhone(contactNumber)) {
             request.setAttribute("contactNumberError", "Please enter a valid 10-digit contact number");
             hasError = true;
         }
 
         // Password validation
-        if (password == null || password.trim().isEmpty()) {
+        if (ValidationUtil.isNullOrEmpty(password)) {
             request.setAttribute("passwordError", "Password is required");
             hasError = true;
-        } else if (password.length() < 8) {
+        } else if (!ValidationUtil.isBasicPassword(password)) {
             request.setAttribute("passwordError", "Password must be at least 8 characters long");
             hasError = true;
-        } else if (!password.matches(".*[A-Z].*")) {
-            request.setAttribute("passwordError", "Password must contain at least one uppercase letter");
-            hasError = true;
-        } else if (!password.matches(".*[0-9].*")) {
-            request.setAttribute("passwordError", "Password must contain at least one number");
-            hasError = true;
+        } else {
+            // Check password strength
+            int passwordStrength = ValidationUtil.getPasswordStrength(password);
+            if (passwordStrength < 3) {
+                request.setAttribute("passwordError",
+                        "Password is too weak. Include uppercase letters, numbers, and special characters.");
+                hasError = true;
+            }
         }
 
         // Confirm password validation
-        if (confirmPassword == null || confirmPassword.trim().isEmpty()) {
+        if (ValidationUtil.isNullOrEmpty(confirmPassword)) {
             request.setAttribute("confirmPasswordError", "Please confirm your password");
             hasError = true;
         } else if (!confirmPassword.equals(password)) {
@@ -125,11 +155,15 @@ public class RegisterServlet extends HttpServlet {
         }
 
         if (hasError) {
-            // Preserve input values
+            // Preserve input values (except password)
             request.setAttribute("firstName", firstName);
             request.setAttribute("lastName", lastName);
             request.setAttribute("email", email);
             request.setAttribute("contactNumber", contactNumber);
+
+            // Regenerate CSRF token
+            HttpSession session = request.getSession(true);
+            session.setAttribute(SessionUtil.CSRF_TOKEN_ATTR, SessionUtil.generateCSRFToken());
 
             // Forward back to registration page with errors
             request.getRequestDispatcher("/register.jsp").forward(request, response);
@@ -157,6 +191,10 @@ public class RegisterServlet extends HttpServlet {
                 request.setAttribute("email", email);
                 request.setAttribute("contactNumber", contactNumber);
 
+                // Regenerate CSRF token
+                HttpSession session = request.getSession(true);
+                session.setAttribute(SessionUtil.CSRF_TOKEN_ATTR, SessionUtil.generateCSRFToken());
+
                 request.getRequestDispatcher("/register.jsp").forward(request, response);
             }
         } catch (Exception e) {
@@ -171,6 +209,10 @@ public class RegisterServlet extends HttpServlet {
             request.setAttribute("lastName", lastName);
             request.setAttribute("email", email);
             request.setAttribute("contactNumber", contactNumber);
+
+            // Regenerate CSRF token
+            HttpSession session = request.getSession(true);
+            session.setAttribute(SessionUtil.CSRF_TOKEN_ATTR, SessionUtil.generateCSRFToken());
 
             request.getRequestDispatcher("/register.jsp").forward(request, response);
         }

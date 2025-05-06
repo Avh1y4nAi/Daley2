@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -405,6 +406,220 @@ public class PropertyDAO {
             pstmt.setInt(1, propertyId);
 
             int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (pstmt != null)
+                    pstmt.close();
+                if (conn != null)
+                    DBUtil.closeConnection(conn);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Create a new property
+     *
+     * @param property Property object to create
+     * @return The created Property object with ID, or null if creation failed
+     */
+    public Property createProperty(Property property) {
+        String sql = "INSERT INTO properties (property_name, property_type, description, location, price, " +
+                "bedrooms, bathrooms, size, size_unit, status) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DBUtil.getConnection();
+            pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
+            pstmt.setString(1, property.getPropertyName());
+            pstmt.setString(2, property.getPropertyType());
+            pstmt.setString(3, property.getDescription());
+            pstmt.setString(4, property.getLocation());
+            pstmt.setBigDecimal(5, property.getPrice());
+
+            if (property.getBedrooms() != null) {
+                pstmt.setInt(6, property.getBedrooms());
+            } else {
+                pstmt.setNull(6, java.sql.Types.INTEGER);
+            }
+
+            if (property.getBathrooms() != null) {
+                pstmt.setInt(7, property.getBathrooms());
+            } else {
+                pstmt.setNull(7, java.sql.Types.INTEGER);
+            }
+
+            if (property.getSize() != null) {
+                pstmt.setBigDecimal(8, property.getSize());
+            } else {
+                pstmt.setNull(8, java.sql.Types.DECIMAL);
+            }
+
+            pstmt.setString(9, property.getSizeUnit() != null ? property.getSizeUnit() : "sq.ft");
+            pstmt.setString(10, property.getStatus());
+
+            int rowsAffected = pstmt.executeUpdate();
+
+            if (rowsAffected > 0) {
+                rs = pstmt.getGeneratedKeys();
+                if (rs.next()) {
+                    int generatedId = rs.getInt(1);
+                    property.setPropertyId(generatedId);
+
+                    // Add default image if available
+                    if (property.getPrimaryImagePath() != null) {
+                        addPropertyImage(property.getPropertyId(), property.getPrimaryImagePath(), true, conn);
+                    }
+
+                    return property;
+                }
+            }
+
+            return null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            try {
+                if (rs != null)
+                    rs.close();
+                if (pstmt != null)
+                    pstmt.close();
+                if (conn != null)
+                    DBUtil.closeConnection(conn);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Add an image to a property
+     *
+     * @param propertyId Property ID
+     * @param imagePath  Path to the image
+     * @param isPrimary  Whether this is the primary image
+     * @param conn       Database connection (optional, will create one if null)
+     * @return true if successful, false otherwise
+     */
+    public boolean addPropertyImage(int propertyId, String imagePath, boolean isPrimary, Connection conn) {
+        String sql = "INSERT INTO property_images (property_id, image_path, is_primary) VALUES (?, ?, ?)";
+        PreparedStatement pstmt = null;
+        boolean shouldCloseConn = (conn == null);
+
+        try {
+            if (conn == null) {
+                conn = DBUtil.getConnection();
+            }
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, propertyId);
+            pstmt.setString(2, imagePath);
+            pstmt.setBoolean(3, isPrimary);
+
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (pstmt != null)
+                    pstmt.close();
+                if (shouldCloseConn && conn != null)
+                    DBUtil.closeConnection(conn);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Update an existing property
+     *
+     * @param property Property object with updated values
+     * @return true if update successful, false otherwise
+     */
+    public boolean updateProperty(Property property) {
+        String sql = "UPDATE properties SET property_name = ?, property_type = ?, description = ?, " +
+                "location = ?, price = ?, bedrooms = ?, bathrooms = ?, size = ?, size_unit = ?, " +
+                "status = ? WHERE property_id = ?";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+
+        try {
+            conn = DBUtil.getConnection();
+            pstmt = conn.prepareStatement(sql);
+
+            pstmt.setString(1, property.getPropertyName());
+            pstmt.setString(2, property.getPropertyType());
+            pstmt.setString(3, property.getDescription());
+            pstmt.setString(4, property.getLocation());
+            pstmt.setBigDecimal(5, property.getPrice());
+
+            if (property.getBedrooms() != null) {
+                pstmt.setInt(6, property.getBedrooms());
+            } else {
+                pstmt.setNull(6, java.sql.Types.INTEGER);
+            }
+
+            if (property.getBathrooms() != null) {
+                pstmt.setInt(7, property.getBathrooms());
+            } else {
+                pstmt.setNull(7, java.sql.Types.INTEGER);
+            }
+
+            if (property.getSize() != null) {
+                pstmt.setBigDecimal(8, property.getSize());
+            } else {
+                pstmt.setNull(8, java.sql.Types.DECIMAL);
+            }
+
+            pstmt.setString(9, property.getSizeUnit() != null ? property.getSizeUnit() : "sq.ft");
+            pstmt.setString(10, property.getStatus());
+            pstmt.setInt(11, property.getPropertyId());
+
+            int rowsAffected = pstmt.executeUpdate();
+
+            // If update was successful and there's a new primary image
+            if (rowsAffected > 0 && property.getPrimaryImagePath() != null) {
+                // First, remove primary flag from all images
+                String updateImgSql = "UPDATE property_images SET is_primary = false WHERE property_id = ?";
+                try (PreparedStatement imgPstmt = conn.prepareStatement(updateImgSql)) {
+                    imgPstmt.setInt(1, property.getPropertyId());
+                    imgPstmt.executeUpdate();
+                }
+
+                // Then, check if the image already exists
+                String checkImgSql = "SELECT COUNT(*) FROM property_images WHERE property_id = ? AND image_path = ?";
+                try (PreparedStatement checkPstmt = conn.prepareStatement(checkImgSql)) {
+                    checkPstmt.setInt(1, property.getPropertyId());
+                    checkPstmt.setString(2, property.getPrimaryImagePath());
+                    ResultSet checkRs = checkPstmt.executeQuery();
+                    if (checkRs.next() && checkRs.getInt(1) > 0) {
+                        // Image exists, update it to primary
+                        String setPrimarySql = "UPDATE property_images SET is_primary = true WHERE property_id = ? AND image_path = ?";
+                        try (PreparedStatement setPrimaryPstmt = conn.prepareStatement(setPrimarySql)) {
+                            setPrimaryPstmt.setInt(1, property.getPropertyId());
+                            setPrimaryPstmt.setString(2, property.getPrimaryImagePath());
+                            setPrimaryPstmt.executeUpdate();
+                        }
+                    } else {
+                        // Image doesn't exist, add it
+                        addPropertyImage(property.getPropertyId(), property.getPrimaryImagePath(), true, conn);
+                    }
+                }
+            }
+
             return rowsAffected > 0;
         } catch (SQLException e) {
             e.printStackTrace();

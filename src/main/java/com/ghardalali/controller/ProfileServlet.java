@@ -11,11 +11,13 @@ import jakarta.servlet.http.HttpSession;
 
 import com.ghardalali.model.User;
 import com.ghardalali.service.UserService;
+import com.ghardalali.util.SessionUtil;
+import com.ghardalali.util.ValidationUtil;
 
 /**
- * Servlet for handling user profile in dashboard
+ * Servlet for handling user profile page
  */
-@WebServlet("/dashboard/profile")
+@WebServlet("/profile")
 public class ProfileServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
@@ -39,6 +41,11 @@ public class ProfileServlet extends HttpServlet {
             return;
         }
 
+        // Generate CSRF token for the form
+        if (session.getAttribute(SessionUtil.CSRF_TOKEN_ATTR) == null) {
+            session.setAttribute(SessionUtil.CSRF_TOKEN_ATTR, SessionUtil.generateCSRFToken());
+        }
+
         // Get user from session
         User user = (User) session.getAttribute("user");
 
@@ -47,7 +54,7 @@ public class ProfileServlet extends HttpServlet {
         request.setAttribute("activeTab", "profile");
 
         // Forward to profile page
-        request.getRequestDispatcher("/profile.jsp").forward(request, response);
+        request.getRequestDispatcher("/new-profile.jsp").forward(request, response);
     }
 
     @Override
@@ -62,6 +69,14 @@ public class ProfileServlet extends HttpServlet {
             return;
         }
 
+        // Verify CSRF token
+        String csrfToken = request.getParameter("csrfToken");
+        if (!SessionUtil.isValidCSRFToken(request, csrfToken)) {
+            request.setAttribute("errorMessage", "Invalid request. Please try again.");
+            request.getRequestDispatcher("/new-profile.jsp").forward(request, response);
+            return;
+        }
+
         // Get user from session
         User user = (User) session.getAttribute("user");
 
@@ -71,8 +86,51 @@ public class ProfileServlet extends HttpServlet {
         String contactNumber = request.getParameter("contactNumber");
         String address = request.getParameter("address");
 
-        // Update user profile (placeholder for now)
-        boolean success = true;
+        // Validate input
+        boolean hasError = false;
+        StringBuilder errorMessage = new StringBuilder("Please correct the following errors:<br>");
+
+        if (firstName == null || firstName.trim().isEmpty()) {
+            errorMessage.append("- First name is required<br>");
+            hasError = true;
+        } else if (!ValidationUtil.isValidName(firstName)) {
+            errorMessage.append("- First name contains invalid characters<br>");
+            hasError = true;
+        }
+
+        if (lastName == null || lastName.trim().isEmpty()) {
+            errorMessage.append("- Last name is required<br>");
+            hasError = true;
+        } else if (!ValidationUtil.isValidName(lastName)) {
+            errorMessage.append("- Last name contains invalid characters<br>");
+            hasError = true;
+        }
+
+        if (contactNumber != null && !contactNumber.trim().isEmpty() && !ValidationUtil.isValidPhone(contactNumber)) {
+            errorMessage.append("- Phone number must be 10 digits<br>");
+            hasError = true;
+        }
+
+        if (hasError) {
+            // Set error message and form values
+            request.setAttribute("errorMessage", errorMessage.toString());
+            request.setAttribute("firstName", firstName);
+            request.setAttribute("lastName", lastName);
+            request.setAttribute("contactNumber", contactNumber);
+            request.setAttribute("address", address);
+
+            // Set attributes in request
+            request.setAttribute("user", user);
+            request.setAttribute("activeTab", "profile");
+            request.setAttribute("editMode", true);
+
+            // Forward to profile page
+            request.getRequestDispatcher("/new-profile.jsp").forward(request, response);
+            return;
+        }
+
+        // Update user profile
+        boolean success = userService.updateUserProfile(user.getUserId(), firstName, lastName, contactNumber, address);
 
         if (success) {
             // Update session user
@@ -86,7 +144,7 @@ public class ProfileServlet extends HttpServlet {
             request.setAttribute("successMessage", "Profile updated successfully");
         } else {
             // Set error message
-            request.setAttribute("errorMessage", "Failed to update profile");
+            request.setAttribute("errorMessage", "Failed to update profile. Please try again later.");
         }
 
         // Set attributes in request
@@ -94,6 +152,6 @@ public class ProfileServlet extends HttpServlet {
         request.setAttribute("activeTab", "profile");
 
         // Forward to profile page
-        request.getRequestDispatcher("/profile.jsp").forward(request, response);
+        request.getRequestDispatcher("/new-profile.jsp").forward(request, response);
     }
 }

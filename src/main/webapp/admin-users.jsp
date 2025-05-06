@@ -18,6 +18,7 @@
             <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modern-ui.css">
             <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard.css">
             <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin.css">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         </head>
 
         <body>
@@ -29,37 +30,7 @@
                         <h1 class="dashboard-title">Admin Dashboard</h1>
 
                         <div class="dashboard-container">
-                            <div class="dashboard-sidebar">
-                                <div class="user-info">
-                                    <div class="user-avatar">
-                                        <img src="${pageContext.request.contextPath}/images/property-placeholder.jpg"
-                                            alt="User Avatar">
-                                    </div>
-                                    <div class="user-details">
-                                        <h3>${user.fullName}</h3>
-                                        <p>${user.email}</p>
-                                    </div>
-                                </div>
-                                <nav class="dashboard-nav">
-                                    <ul>
-                                        <li><a href="${pageContext.request.contextPath}/admin/dashboard">Dashboard</a>
-                                        </li>
-                                        <li class="active"><a
-                                                href="${pageContext.request.contextPath}/admin/users">Manage Users</a>
-                                        </li>
-                                        <li><a href="${pageContext.request.contextPath}/admin/properties">Manage
-                                                Properties</a></li>
-                                        <li><a href="${pageContext.request.contextPath}/admin/applications">Manage
-                                                Applications</a></li>
-                                        <li><a href="${pageContext.request.contextPath}/admin/reviews">Manage
-                                                Reviews</a></li>
-                                        <li><a href="${pageContext.request.contextPath}/admin/payments">Payment
-                                                History</a></li>
-                                        <li><a href="${pageContext.request.contextPath}/dashboard/change-password">Change
-                                                Password</a></li>
-                                    </ul>
-                                </nav>
-                            </div>
+                            <jsp:include page="admin-sidebar.jsp" />
                             <div class="dashboard-content">
                                 <div class="dashboard-header">
                                     <h2>Manage Users</h2>
@@ -100,8 +71,10 @@
                                                     <td>${userItem.userRole}</td>
                                                     <td>${userItem.createdAt}</td>
                                                     <td class="actions">
-                                                        <button class="btn-icon view" title="View User">V</button>
-                                                        <button class="btn-icon edit" title="Edit User">E</button>
+                                                        <button class="btn-icon view" title="View User"><i
+                                                                class="fas fa-eye"></i></button>
+                                                        <button class="btn-icon edit" title="Edit User"><i
+                                                                class="fas fa-edit"></i></button>
                                                         <form action="${pageContext.request.contextPath}/admin/users"
                                                             method="post" style="display: inline;">
                                                             <input type="hidden" name="action" value="delete">
@@ -109,7 +82,8 @@
                                                                 value="${userItem.userId}">
                                                             <button type="submit" class="btn-icon delete"
                                                                 title="Delete User"
-                                                                onclick="return confirm('Are you sure you want to delete this user?')">D</button>
+                                                                onclick="return confirm('Are you sure you want to delete this user?')"><i
+                                                                    class="fas fa-trash"></i></button>
                                                         </form>
                                                     </td>
                                                 </tr>

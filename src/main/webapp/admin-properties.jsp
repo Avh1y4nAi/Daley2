@@ -29,42 +29,30 @@
                         <h1 class="dashboard-title">Admin Dashboard</h1>
 
                         <div class="dashboard-container">
-                            <div class="dashboard-sidebar">
-                                <div class="user-info">
-                                    <div class="user-avatar">
-                                        <img src="${pageContext.request.contextPath}/images/property-placeholder.jpg"
-                                            alt="User Avatar">
-                                    </div>
-                                    <div class="user-details">
-                                        <h3>${user.fullName}</h3>
-                                        <p>${user.email}</p>
-                                    </div>
-                                </div>
-                                <nav class="dashboard-nav">
-                                    <ul>
-                                        <li><a href="${pageContext.request.contextPath}/admin/dashboard">Dashboard</a>
-                                        </li>
-                                        <li><a href="${pageContext.request.contextPath}/admin/users">Manage Users</a>
-                                        </li>
-                                        <li class="active"><a
-                                                href="${pageContext.request.contextPath}/admin/properties">Manage
-                                                Properties</a></li>
-                                        <li><a href="${pageContext.request.contextPath}/admin/applications">Manage
-                                                Applications</a></li>
-                                        <li><a href="${pageContext.request.contextPath}/admin/reviews">Manage
-                                                Reviews</a></li>
-                                        <li><a href="${pageContext.request.contextPath}/admin/payments">Payment
-                                                History</a></li>
-                                        <li><a href="${pageContext.request.contextPath}/dashboard/change-password">Change
-                                                Password</a></li>
-                                    </ul>
-                                </nav>
-                            </div>
+                            <jsp:include page="admin-sidebar.jsp" />
                             <div class="dashboard-content">
                                 <div class="dashboard-header">
                                     <h2>Manage Properties</h2>
-                                    <button class="btn btn-primary">Add New Property</button>
+                                    <a href="${pageContext.request.contextPath}/admin/properties?action=new"
+                                        class="btn btn-primary">Add New Property</a>
                                 </div>
+
+                                <c:if test="${not empty successMessage}">
+                                    <div class="alert alert-success">
+                                        <p>${successMessage}</p>
+                                    </div>
+                                </c:if>
+                                <c:if test="${not empty errorMessage}">
+                                    <div class="alert alert-error">
+                                        <p>${errorMessage}</p>
+                                    </div>
+                                </c:if>
+                                <c:if test="${not empty sessionScope.successMessage}">
+                                    <div class="alert alert-success">
+                                        <p>${sessionScope.successMessage}</p>
+                                    </div>
+                                    <c:remove var="successMessage" scope="session" />
+                                </c:if>
 
                                 <div class="admin-table-container">
                                     <div class="table-actions">
@@ -99,23 +87,50 @@
                                             <c:forEach items="${properties}" var="property">
                                                 <tr>
                                                     <td>${property.propertyId}</td>
-                                                    <td>${property.title}</td>
+                                                    <td>${property.propertyName}</td>
                                                     <td>${property.propertyType}</td>
                                                     <td>NPR ${property.price}</td>
                                                     <td>${property.status}</td>
                                                     <td>${property.createdAt}</td>
                                                     <td class="actions">
-                                                        <button class="btn-icon view" title="View Property">V</button>
-                                                        <button class="btn-icon edit" title="Edit Property">E</button>
+                                                        <a href="${pageContext.request.contextPath}/admin/properties?action=view&propertyId=${property.propertyId}"
+                                                            class="btn-icon view" title="View Property">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16"
+                                                                height="16" fill="currentColor" viewBox="0 0 16 16">
+                                                                <path
+                                                                    d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z" />
+                                                                <path
+                                                                    d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" />
+                                                            </svg>
+                                                        </a>
+                                                        <a href="${pageContext.request.contextPath}/admin/properties?action=edit&propertyId=${property.propertyId}"
+                                                            class="btn-icon edit" title="Edit Property">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16"
+                                                                height="16" fill="currentColor" viewBox="0 0 16 16">
+                                                                <path
+                                                                    d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z" />
+                                                            </svg>
+                                                        </a>
                                                         <form
                                                             action="${pageContext.request.contextPath}/admin/properties"
                                                             method="post" style="display: inline;">
+                                                            <!-- CSRF Protection -->
+                                                            <input type="hidden" name="csrfToken"
+                                                                value="${sessionScope.csrfToken}">
                                                             <input type="hidden" name="action" value="delete">
                                                             <input type="hidden" name="propertyId"
                                                                 value="${property.propertyId}">
                                                             <button type="submit" class="btn-icon delete"
                                                                 title="Delete Property"
-                                                                onclick="return confirm('Are you sure you want to delete this property?')">D</button>
+                                                                onclick="return confirm('Are you sure you want to delete this property?')">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16"
+                                                                    height="16" fill="currentColor" viewBox="0 0 16 16">
+                                                                    <path
+                                                                        d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                                                                    <path fill-rule="evenodd"
+                                                                        d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+                                                                </svg>
+                                                            </button>
                                                         </form>
                                                     </td>
                                                 </tr>

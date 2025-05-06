@@ -1,10 +1,14 @@
 package com.ghardalali.service;
 
+import java.util.Date;
 import java.util.List;
 
 import com.ghardalali.model.User;
 import com.ghardalali.model.UserDAO;
+import com.ghardalali.util.EmailUtil;
 import com.ghardalali.util.PasswordUtil;
+import com.ghardalali.util.TokenUtil;
+import com.ghardalali.util.ValidationUtil;
 
 /**
  * Service class for user-related operations
@@ -147,6 +151,79 @@ public class UserService {
     }
 
     /**
+     * Create a password reset token and send reset email
+     *
+     * @param email   User's email
+     * @param baseUrl Base URL of the application
+     * @return true if token created and email sent successfully, false otherwise
+     */
+    public boolean createPasswordResetTokenAndSendEmail(String email, String baseUrl) {
+        // Check if email exists
+        if (!userDAO.isEmailExists(email)) {
+            return false;
+        }
+
+        // Generate token
+        String token = TokenUtil.generateToken();
+
+        // Calculate expiry date
+        Date expiryDate = TokenUtil.calculateExpiryDate();
+
+        // Create token in database
+        boolean tokenCreated = userDAO.createPasswordResetToken(email, token, expiryDate);
+
+        if (!tokenCreated) {
+            return false;
+        }
+
+        // Generate reset URL
+        String resetUrl = TokenUtil.generateResetUrl(baseUrl, token);
+
+        // Send email
+        return EmailUtil.sendPasswordResetEmail(email, resetUrl, TokenUtil.TOKEN_EXPIRY_HOURS);
+    }
+
+    /**
+     * Validate a password reset token
+     *
+     * @param token Reset token
+     * @return User's email if token is valid, null otherwise
+     */
+    public String validatePasswordResetToken(String token) {
+        return userDAO.validatePasswordResetToken(token);
+    }
+
+    /**
+     * Reset user password
+     *
+     * @param token       Reset token
+     * @param newPassword New password (plain text)
+     * @return true if password reset successful, false otherwise
+     */
+    public boolean resetPassword(String token, String newPassword) {
+        // Validate token
+        String email = userDAO.validatePasswordResetToken(token);
+
+        if (email == null) {
+            return false;
+        }
+
+        // Hash the new password
+        String hashedPassword = PasswordUtil.hashPassword(newPassword);
+
+        // Reset password
+        boolean passwordReset = userDAO.resetPassword(email, hashedPassword);
+
+        if (passwordReset) {
+            // Delete the used token
+            userDAO.deletePasswordResetToken(token);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Get all users
      *
      * @return List of all users
@@ -163,5 +240,60 @@ public class UserService {
      */
     public boolean deleteUser(int userId) {
         return userDAO.deleteUser(userId);
+    }
+
+    /**
+     * Update user profile information
+     *
+     * @param userId        User ID
+     * @param firstName     User's first name
+     * @param lastName      User's last name
+     * @param contactNumber User's contact number
+     * @param address       User's address
+     * @return true if update successful, false otherwise
+     */
+    public boolean updateUserProfile(int userId, String firstName, String lastName, String contactNumber,
+            String address) {
+        try {
+            // Get user by ID
+            User user = userDAO.getUserById(userId);
+
+            if (user == null) {
+                return false;
+            }
+
+            // Validate input
+            boolean hasError = false;
+
+            if (firstName == null || firstName.trim().isEmpty() || !ValidationUtil.isValidName(firstName)) {
+                hasError = true;
+            }
+
+            if (lastName == null || lastName.trim().isEmpty() || !ValidationUtil.isValidName(lastName)) {
+                hasError = true;
+            }
+
+            if (contactNumber != null && !contactNumber.trim().isEmpty()
+                    && !ValidationUtil.isValidPhone(contactNumber)) {
+                hasError = true;
+            }
+
+            if (hasError) {
+                return false;
+            }
+
+            // Update user object
+            user.setFirstName(firstName);
+            user.setLastName(lastName);
+            user.setContactNumber(contactNumber);
+            user.setAddress(address);
+
+            // Update user in database
+            return userDAO.updateUserProfile(user);
+        } catch (Exception e) {
+            System.err.println("Exception during profile update: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
 }

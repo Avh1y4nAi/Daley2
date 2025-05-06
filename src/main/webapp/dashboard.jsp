@@ -39,53 +39,87 @@
                                 </div>
                                 <nav class="dashboard-nav">
                                     <ul>
-                                        <li class="active"><a
+                                        <li class="${activeTab == 'dashboard' ? 'active' : ''}"><a
+                                                href="${pageContext.request.contextPath}/dashboard">Dashboard</a></li>
+                                        <li class="${activeTab == 'profile' ? 'active' : ''}"><a
                                                 href="${pageContext.request.contextPath}/dashboard/profile">My
                                                 Profile</a></li>
-                                        <li><a href="${pageContext.request.contextPath}/dashboard/saved-properties">Saved
+                                        <li class="${activeTab == 'saved-properties' ? 'active' : ''}"><a
+                                                href="${pageContext.request.contextPath}/dashboard/saved-properties">Saved
                                                 Properties</a></li>
-                                        <li><a href="${pageContext.request.contextPath}/dashboard/applications">My
+                                        <li class="${activeTab == 'applications' ? 'active' : ''}"><a
+                                                href="${pageContext.request.contextPath}/dashboard/applications">My
                                                 Applications</a></li>
-                                        <li><a href="${pageContext.request.contextPath}/dashboard/reviews">My
+                                        <li class="${activeTab == 'reviews' ? 'active' : ''}"><a
+                                                href="${pageContext.request.contextPath}/dashboard/reviews">My
                                                 Reviews</a></li>
-                                        <li><a href="${pageContext.request.contextPath}/dashboard/payment-history">Payment
+                                        <li class="${activeTab == 'payment-history' ? 'active' : ''}"><a
+                                                href="${pageContext.request.contextPath}/dashboard/payment-history">Payment
                                                 History</a></li>
-                                        <li><a href="${pageContext.request.contextPath}/dashboard/change-password">Change
-                                                Password</a></li>
                                     </ul>
                                 </nav>
                             </div>
                             <div class="dashboard-content">
                                 <div class="dashboard-header">
-                                    <h2>My Profile</h2>
-                                    <button class="btn">View Full Profile</button>
+                                    <h2>${activeTab == 'dashboard' ? 'Dashboard' : 'My Profile'}</h2>
+                                    <c:if test="${activeTab == 'profile'}">
+                                        <button class="btn">View Full Profile</button>
+                                    </c:if>
                                 </div>
-                                <div class="profile-details">
-                                    <div class="profile-item">
-                                        <h4>First Name</h4>
-                                        <p>${user.firstName}</p>
-                                    </div>
-                                    <div class="profile-item">
-                                        <h4>Last Name</h4>
-                                        <p>${user.lastName}</p>
-                                    </div>
-                                    <div class="profile-item">
-                                        <h4>Email Address</h4>
-                                        <p>${user.email}</p>
-                                    </div>
-                                    <div class="profile-item">
-                                        <h4>Phone Number</h4>
-                                        <p>${user.contactNumber}</p>
-                                    </div>
-                                    <div class="profile-item">
-                                        <h4>Address</h4>
-                                        <p>${user.address}</p>
-                                    </div>
-                                    <div class="profile-item">
-                                        <h4>Member Since</h4>
-                                        <p>${user.createdAt}</p>
-                                    </div>
-                                </div>
+
+                                <c:choose>
+                                    <c:when test="${activeTab == 'dashboard'}">
+                                        <div class="dashboard-welcome">
+                                            <h3>Welcome, ${user.firstName}!</h3>
+                                            <p>Welcome to your personal dashboard. From here you can manage your
+                                                profile,
+                                                view saved properties, track applications, and more.</p>
+
+                                            <div class="dashboard-stats">
+                                                <div class="stat-card">
+                                                    <h4>Saved Properties</h4>
+                                                    <p>0</p>
+                                                </div>
+                                                <div class="stat-card">
+                                                    <h4>Applications</h4>
+                                                    <p>0</p>
+                                                </div>
+                                                <div class="stat-card">
+                                                    <h4>Reviews</h4>
+                                                    <p>0</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <div class="profile-details">
+                                            <div class="profile-item">
+                                                <h4>First Name</h4>
+                                                <p>${user.firstName}</p>
+                                            </div>
+                                            <div class="profile-item">
+                                                <h4>Last Name</h4>
+                                                <p>${user.lastName}</p>
+                                            </div>
+                                            <div class="profile-item">
+                                                <h4>Email Address</h4>
+                                                <p>${user.email}</p>
+                                            </div>
+                                            <div class="profile-item">
+                                                <h4>Phone Number</h4>
+                                                <p>${user.contactNumber}</p>
+                                            </div>
+                                            <div class="profile-item">
+                                                <h4>Address</h4>
+                                                <p>${user.address}</p>
+                                            </div>
+                                            <div class="profile-item">
+                                                <h4>Member Since</h4>
+                                                <p>${user.createdAt}</p>
+                                            </div>
+                                        </div>
+                                    </c:otherwise>
+                                </c:choose>
                             </div>
                         </div>
                     </div>

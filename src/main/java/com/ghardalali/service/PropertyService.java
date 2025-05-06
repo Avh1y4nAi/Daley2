@@ -118,4 +118,36 @@ public class PropertyService {
     public boolean deleteProperty(int propertyId) {
         return propertyDAO.deleteProperty(propertyId);
     }
+
+    /**
+     * Create a new property
+     *
+     * @param property Property object to create
+     * @return The created Property object with ID, or null if creation failed
+     */
+    public Property createProperty(Property property) {
+        return propertyDAO.createProperty(property);
+    }
+
+    /**
+     * Add an image to a property
+     *
+     * @param propertyId Property ID
+     * @param imagePath  Path to the image
+     * @param isPrimary  Whether this is the primary image
+     * @return true if successful, false otherwise
+     */
+    public boolean addPropertyImage(int propertyId, String imagePath, boolean isPrimary) {
+        return propertyDAO.addPropertyImage(propertyId, imagePath, isPrimary, null);
+    }
+
+    /**
+     * Update an existing property
+     *
+     * @param property Property object with updated values
+     * @return true if update successful, false otherwise
+     */
+    public boolean updateProperty(Property property) {
+        return propertyDAO.updateProperty(property);
+    }
 }

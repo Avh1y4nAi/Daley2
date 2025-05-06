@@ -15,7 +15,21 @@
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/responsive.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/glassmorphism.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modern-ui.css">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/home-enhanced.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/color-palette.css?v=1.0">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar-custom.css?v=1.0">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/home-enhanced.css?v=1.2">
+        <style>
+            /* Ensure hero section styles take precedence */
+            .hero .hero-content {
+                text-align: left !important;
+                margin: 0 !important;
+                max-width: 650px !important;
+            }
+
+            .hero .search-form {
+                margin: 0 !important;
+            }
+        </style>
     </head>
 
     <body>
@@ -25,8 +39,9 @@
         <section class="hero">
             <div class="container">
                 <div class="hero-content">
-                    <h2>Discover Your <span class="highlight">Perfect Home</span></h2>
-                    <p>A real estate platform that connects you. Explore and find your dream home in Nepal</p>
+                    <h2>Find Your <span class="highlight">Dream Home</span> in Nepal</h2>
+                    <p>A modern real estate platform that connects buyers, sellers, and renters with the perfect
+                        properties</p>
                     <div class="search-container">
                         <form class="search-form" action="${pageContext.request.contextPath}/properties" method="get">
                             <input type="text" name="search-keyword" placeholder="Search for properties...">

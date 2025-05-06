@@ -1,7 +1,10 @@
-// Profile UI - Simplified for UI interactions only
+/**
+ * Ghar Dalali - User Profile Page JavaScript
+ * Handles UI interactions for the user profile page
+ */
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Get DOM elements
+    // Get DOM elements for profile sections
     const sections = {
         view: document.getElementById('view-profile'),
         edit: document.getElementById('edit-profile'),
@@ -29,20 +32,8 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('cancel-edit-btn')?.addEventListener('click', () => showSection('view'));
     document.getElementById('change-password-btn')?.addEventListener('click', () => showSection('password'));
     document.getElementById('cancel-password-btn')?.addEventListener('click', () => showSection('view'));
-
-    // Form submissions - UI feedback only
-    document.getElementById('profile-form')?.addEventListener('submit', function (e) {
-        e.preventDefault();
-        showModal('UI Demonstration', 'This is a UI demonstration only.');
-        showSection('view');
-    });
-
-    document.getElementById('password-form')?.addEventListener('submit', function (e) {
-        e.preventDefault();
-        showModal('UI Demonstration', 'This is a UI demonstration only.');
-        this.reset();
-        showSection('view');
-    });
+    document.getElementById('enable-2fa-btn')?.addEventListener('click', () =>
+        showModal('Feature Coming Soon', 'Two-factor authentication will be available soon.'));
 
     // Password strength checker
     document.getElementById('new-password')?.addEventListener('input', function () {
@@ -82,14 +73,28 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // Confirm password validation
+    document.getElementById('confirm-password')?.addEventListener('input', function () {
+        const newPassword = document.getElementById('new-password')?.value;
+        if (this.value !== newPassword) {
+            this.setCustomValidity('Passwords do not match');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+
     // Avatar change button
     document.querySelector('.change-avatar-btn')?.addEventListener('click', () =>
-        showModal('UI Demonstration', 'This is a UI demonstration only.'));
+        showModal('Change Profile Picture', 'This feature will be available soon.'));
 
-    // Toggle switches for preferences - UI only
+    // Toggle switches for preferences
     document.querySelectorAll('.toggle-switch input').forEach(toggle => {
         toggle.addEventListener('change', function () {
-            // UI-only interaction, no console logging
+            const preferenceName = this.closest('.preference-item').querySelector('h3').textContent;
+            const status = this.checked ? 'enabled' : 'disabled';
+
+            // In a real implementation, this would send an AJAX request to update preferences
+            showModal('Preference Updated', `${preferenceName} has been ${status}.`);
         });
     });
 });

@@ -72,6 +72,9 @@
                             </div>
 
                             <form class="auth-form" action="${pageContext.request.contextPath}/login" method="post">
+                                <!-- CSRF Protection -->
+                                <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
+
                                 <div class="form-group">
                                     <label for="email">Email Address</label>
                                     <input type="email" id="email" name="email" placeholder="Enter your email"

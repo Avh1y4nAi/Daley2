@@ -29,37 +29,7 @@
                         <h1 class="dashboard-title">Admin Dashboard</h1>
 
                         <div class="dashboard-container">
-                            <div class="dashboard-sidebar">
-                                <div class="user-info">
-                                    <div class="user-avatar">
-                                        <img src="${pageContext.request.contextPath}/images/property-placeholder.jpg"
-                                            alt="User Avatar">
-                                    </div>
-                                    <div class="user-details">
-                                        <h3>${user.fullName}</h3>
-                                        <p>${user.email}</p>
-                                    </div>
-                                </div>
-                                <nav class="dashboard-nav">
-                                    <ul>
-                                        <li><a href="${pageContext.request.contextPath}/admin/dashboard">Dashboard</a>
-                                        </li>
-                                        <li><a href="${pageContext.request.contextPath}/admin/users">Manage Users</a>
-                                        </li>
-                                        <li><a href="${pageContext.request.contextPath}/admin/properties">Manage
-                                                Properties</a></li>
-                                        <li><a href="${pageContext.request.contextPath}/admin/applications">Manage
-                                                Applications</a></li>
-                                        <li class="active"><a
-                                                href="${pageContext.request.contextPath}/admin/reviews">Manage
-                                                Reviews</a></li>
-                                        <li><a href="${pageContext.request.contextPath}/admin/payments">Payment
-                                                History</a></li>
-                                        <li><a href="${pageContext.request.contextPath}/dashboard/change-password">Change
-                                                Password</a></li>
-                                    </ul>
-                                </nav>
-                            </div>
+                            <jsp:include page="admin-sidebar.jsp" />
                             <div class="dashboard-content">
                                 <div class="dashboard-header">
                                     <h2>Manage Reviews</h2>

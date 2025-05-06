@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import com.ghardalali.model.User;
+import com.ghardalali.util.SessionUtil;
 
 /**
  * Filter to check if user is an admin for admin-protected pages
@@ -32,22 +33,28 @@ public class AdminFilter implements Filter {
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
-        HttpSession session = httpRequest.getSession(false);
 
-        boolean isLoggedIn = (session != null && session.getAttribute("user") != null);
+        // Check if user is logged in
+        if (SessionUtil.isLoggedIn(httpRequest)) {
+            User user = SessionUtil.getCurrentUser(httpRequest);
 
-        if (isLoggedIn) {
-            User user = (User) session.getAttribute("user");
-            
             if (user.isAdmin()) {
                 // User is admin, continue with the request
                 chain.doFilter(request, response);
             } else {
-                // User is not admin, redirect to regular dashboard
+                // User is not admin, redirect to regular dashboard with access denied message
+                HttpSession session = httpRequest.getSession(true);
+                session.setAttribute("errorMessage", "Access denied. You do not have administrator privileges.");
                 httpResponse.sendRedirect(httpRequest.getContextPath() + "/dashboard");
             }
         } else {
-            // User is not logged in, redirect to login page
+            // User is not logged in, store the original request URL for redirect after
+            // login
+            HttpSession session = httpRequest.getSession(true);
+            session.setAttribute("redirectAfterLogin", httpRequest.getRequestURI());
+            session.setAttribute("errorMessage", "Please login to access the admin area.");
+
+            // Redirect to login page
             httpResponse.sendRedirect(httpRequest.getContextPath() + "/login");
         }
     }

@@ -66,6 +66,9 @@
                             </div>
 
                             <form class="auth-form" action="${pageContext.request.contextPath}/register" method="post">
+                                <!-- CSRF Protection -->
+                                <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
+
                                 <div class="form-row">
                                     <div class="form-group">
                                         <label for="firstName">First Name</label>
@@ -157,7 +160,7 @@
             <script src="${pageContext.request.contextPath}/js/main.js"></script>
             <script>
                 // Client-side validation for registration form
-                document.addEventListener('DOMContentLoaded', function () {
+                document.addEventListener('DOMContentLoaded', funct ion () {
                     const form = document.querySelector('.auth-form');
                     const password = document.getElementById('password');
                     const confirmPassword = document.getElementById('confirmPassword');
@@ -165,7 +168,7 @@
                     const contactNumber = document.getElementById('contactNumber');
 
                     // Password strength indicator
-                    password.addEventListener('input', function () {
+                    password.addEventListener('input', func tion () {
                         const value = this.value;
                         let strength = 0;
                         let message = '';
@@ -227,7 +230,7 @@
                     });
 
                     // Real-time password match validation
-                    confirmPassword.addEventListener('input', function () {
+                    confirmPassword.addEventListener('input', fun ction () {
                         if (password.value !== this.value) {
                             this.setCustomValidity('Passwords do not match');
                         } else {
@@ -236,7 +239,7 @@
                     });
 
                     // Email validation
-                    email.addEventListener('input', function () {
+                    email.addEventListener('input', fu nction () {
                         const emailRegex = /^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$/;
                         if (!emailRegex.test(this.value) && this.value.length > 0) {
                             this.setCustomValidity('Please enter a valid email address');
@@ -246,7 +249,7 @@
                     });
 
                     // Contact number validation
-                    contactNumber.addEventListener('input', function () {
+                    contactNumber.addEventListener('input', f unction () {
                         const numberRegex = /^[0-9]{10}$/;
                         if (!numberRegex.test(this.value) && this.value.length > 0) {
                             this.setCustomValidity('Please enter a valid 10-digit contact number');
@@ -256,7 +259,7 @@
                     });
 
                     // Form submission validation
-                    form.addEventListener('submit', function (e) {
+                    form.addEventListener('submit',  function (e) {
                         // Validate password match
                         if (password.value !== confirmPassword.value) {
                             e.preventDefault();

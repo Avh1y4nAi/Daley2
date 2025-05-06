@@ -1,6 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
     <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
+        <!-- Include custom styling -->
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/color-palette.css?v=1.0">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar-custom.css?v=1.0">
+
         <!-- Navigation Bar -->
         <header class="navbar">
             <div class="container">
@@ -25,8 +29,20 @@
                             <a href="${pageContext.request.contextPath}/register" class="btn btn-primary">Register</a>
                         </c:when>
                         <c:otherwise>
-                            <a href="${pageContext.request.contextPath}/dashboard" class="btn btn-outline">Dashboard</a>
-                            <a href="${pageContext.request.contextPath}/logout" class="btn btn-primary">Logout</a>
+                            <c:choose>
+                                <c:when test="${sessionScope.user.userRole eq 'ADMIN'}">
+                                    <a href="${pageContext.request.contextPath}/admin/dashboard"
+                                        class="btn btn-outline">Dashboard</a>
+                                    <a href="${pageContext.request.contextPath}/logout"
+                                        class="btn btn-primary">Logout</a>
+                                </c:when>
+                                <c:otherwise>
+                                    <a href="${pageContext.request.contextPath}/profile" class="btn btn-outline">My
+                                        Profile</a>
+                                    <a href="${pageContext.request.contextPath}/logout"
+                                        class="btn btn-primary">Logout</a>
+                                </c:otherwise>
+                            </c:choose>
                         </c:otherwise>
                     </c:choose>
                 </div>

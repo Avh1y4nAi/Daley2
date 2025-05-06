@@ -1,7 +1,7 @@
 /*
    Ghar Dalali - Dashboard Stylesheet
-   
-   
+
+
 */
 
 /* Dashboard Section */
@@ -43,12 +43,21 @@
     height: fit-content;
 }
 
+.user-info {
+    background-color: var(--primary-color);
+    padding: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
 .user-avatar {
     width: 60px;
     height: 60px;
     border-radius: 50%;
     overflow: hidden;
     border: 2px solid white;
+    flex-shrink: 0;
 }
 
 .user-avatar img {
@@ -57,14 +66,20 @@
     object-fit: cover;
 }
 
+.user-details {
+    flex: 1;
+}
+
 .user-details h3 {
     margin-bottom: var(--spacing-xs);
     color: white;
+    font-size: 1rem;
 }
 
 .user-details p {
     font-size: 0.9rem;
-    opacity: 0.8;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
 }
 
 .dashboard-nav ul {

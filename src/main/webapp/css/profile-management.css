@@ -1,0 +1,154 @@
+/*
+   Ghar Dalali - Profile Management Stylesheet
+*/
+
+/* Profile Section Styles */
+.profile-section {
+    margin-bottom: 2rem;
+}
+
+.profile-section.hidden {
+    display: none;
+}
+
+.profile-details {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.profile-item {
+    margin-bottom: 1.5rem;
+}
+
+.profile-item h4 {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+}
+
+.profile-item p {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #1f2937;
+    margin: 0;
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #4b5563;
+    margin-bottom: 0.5rem;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.form-group input:disabled {
+    background-color: #f3f4f6;
+    cursor: not-allowed;
+}
+
+.form-group small {
+    display: block;
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-top: 0.5rem;
+}
+
+.form-group .required {
+    color: #ef4444;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+/* Button Styles */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.btn-primary {
+    background-color: #4f46e5;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #4338ca;
+}
+
+.btn-secondary {
+    background-color: #f3f4f6;
+    color: #4b5563;
+}
+
+.btn-secondary:hover {
+    background-color: #e5e7eb;
+}
+
+/* Alert Styles */
+.alert {
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+}
+
+.alert-success {
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.alert-error {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+/* Responsive Styles */
+@media screen and (max-width: 768px) {
+    .profile-details {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions button {
+        width: 100%;
+    }
+}
