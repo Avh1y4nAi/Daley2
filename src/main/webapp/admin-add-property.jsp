@@ -51,7 +51,7 @@
                                     </c:if>
 
                                     <form action="${pageContext.request.contextPath}/admin/properties" method="post"
-                                        class="property-form">
+                                        class="property-form" enctype="multipart/form-data">
                                         <!-- CSRF Protection -->
                                         <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
                                         <input type="hidden" name="action" value="add">
@@ -132,11 +132,39 @@
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="imagePath">Primary Image URL</label>
+                                            <label for="propertyImage1">Primary Property Image</label>
+                                            <input type="file" id="propertyImage1" name="propertyImage1"
+                                                accept="image/*">
+                                            <small>Upload the main image for this property (max 5MB)</small>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="propertyImage2">Additional Image 1</label>
+                                            <input type="file" id="propertyImage2" name="propertyImage2"
+                                                accept="image/*">
+                                            <small>Upload an additional image (max 5MB)</small>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="propertyImage3">Additional Image 2</label>
+                                            <input type="file" id="propertyImage3" name="propertyImage3"
+                                                accept="image/*">
+                                            <small>Upload an additional image (max 5MB)</small>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="propertyImage4">Additional Image 3</label>
+                                            <input type="file" id="propertyImage4" name="propertyImage4"
+                                                accept="image/*">
+                                            <small>Upload an additional image (max 5MB)</small>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="imagePath">Alternative Image URL (Optional)</label>
                                             <input type="text" id="imagePath" name="imagePath"
                                                 placeholder="https://example.com/image.jpg">
-                                            <small>Enter a URL for the property image. You can add more images
-                                                later.</small>
+                                            <small>If you prefer to use an external image URL instead of
+                                                uploading</small>
                                         </div>
 
                                         <div class="form-actions">

@@ -3,22 +3,28 @@ package com.ghardalali.controller;
 import java.io.IOException;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 
 import com.ghardalali.model.User;
 import com.ghardalali.service.UserService;
 import com.ghardalali.util.SessionUtil;
+import com.ghardalali.util.UserImageUtil;
 import com.ghardalali.util.ValidationUtil;
 
 /**
  * Servlet for handling user profile page
  */
 @WebServlet("/profile")
-public class ProfileServlet extends HttpServlet {
+@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, // 2MB
+        maxFileSize = 1024 * 1024 * 5, // 5MB
+        maxRequestSize = 1024 * 1024 * 10 // 10MB
+)
+public class ProfileServlet extends BaseServlet {
     private static final long serialVersionUID = 1L;
 
     private UserService userService;
@@ -85,6 +91,59 @@ public class ProfileServlet extends HttpServlet {
         String lastName = request.getParameter("lastName");
         String contactNumber = request.getParameter("contactNumber");
         String address = request.getParameter("address");
+
+        // Check if this is a profile image upload request
+        String action = request.getParameter("action");
+        if ("uploadProfileImage".equals(action)) {
+            try {
+                // Get the uploaded file
+                Part filePart = request.getPart("profileImage");
+
+                if (filePart != null && filePart.getSize() > 0) {
+                    // Upload the profile image
+                    String profileImagePath = UserImageUtil.uploadProfileImage(request, "profileImage",
+                            user.getUserId());
+
+                    if (profileImagePath != null) {
+                        // Update the user's profile image in the database
+                        boolean imageUpdateSuccess = userService.updateProfileImage(user.getUserId(), profileImagePath);
+
+                        if (imageUpdateSuccess) {
+                            // Update the user in the session
+                            user.setProfileImagePath(profileImagePath);
+                            session.setAttribute("user", user);
+
+                            // Set success message
+                            request.setAttribute("successMessage", "Profile image updated successfully");
+                        } else {
+                            // Set error message
+                            request.setAttribute("errorMessage", "Failed to update profile image. Please try again.");
+                        }
+                    } else {
+                        // Set error message
+                        request.setAttribute("errorMessage", "Failed to upload profile image. Please try again.");
+                    }
+                } else {
+                    // Set error message
+                    request.setAttribute("errorMessage", "No image selected. Please select an image to upload.");
+                }
+
+                // Set attributes in request
+                request.setAttribute("user", user);
+                request.setAttribute("activeTab", "profile");
+
+                // Forward to profile page
+                request.getRequestDispatcher("/new-profile.jsp").forward(request, response);
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+                request.setAttribute("errorMessage", "Error uploading profile image: " + e.getMessage());
+                request.setAttribute("user", user);
+                request.setAttribute("activeTab", "profile");
+                request.getRequestDispatcher("/new-profile.jsp").forward(request, response);
+                return;
+            }
+        }
 
         // Validate input
         boolean hasError = false;

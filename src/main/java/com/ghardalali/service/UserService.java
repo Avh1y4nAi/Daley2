@@ -296,4 +296,27 @@ public class UserService {
             return false;
         }
     }
+
+    /**
+     * Update user profile image
+     *
+     * @param userId           User ID
+     * @param profileImagePath Path to the profile image
+     * @return true if update successful, false otherwise
+     */
+    public boolean updateProfileImage(int userId, String profileImagePath) {
+        try {
+            // Validate inputs
+            if (userId <= 0 || profileImagePath == null || profileImagePath.trim().isEmpty()) {
+                return false;
+            }
+
+            // Update profile image in database
+            return userDAO.updateProfileImage(userId, profileImagePath);
+        } catch (Exception e) {
+            System.err.println("Exception during profile image update: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

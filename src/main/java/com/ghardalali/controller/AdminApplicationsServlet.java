@@ -5,7 +5,7 @@ import java.util.List;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -18,7 +18,7 @@ import com.ghardalali.service.ApplicationService;
  * Servlet for handling admin applications management
  */
 @WebServlet("/admin/applications")
-public class AdminApplicationsServlet extends HttpServlet {
+public class AdminApplicationsServlet extends BaseServlet {
     private static final long serialVersionUID = 1L;
     
     private ApplicationService applicationService;

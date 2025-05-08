@@ -33,7 +33,8 @@
                                 method="get">
                                 <input type="text" name="search-keyword"
                                     placeholder="Search by location, property type, or keyword..." value="${keyword}">
-                                <button type="submit" class="btn btn-primary">Search</button>
+                                <button type="submit" class="btn btn-primary"
+                                    style="border-radius: 0.7rem !important;">Search</button>
                             </form>
                         </div>
                     </div>
@@ -116,7 +117,8 @@
                                     </div>
 
                                     <div class="filter-buttons">
-                                        <button type="submit" class="btn btn-primary">Apply Filters</button>
+                                        <button type="submit" class="btn btn-primary"
+                                            style="border-radius: 0.7rem !important;">Apply Filters</button>
                                         <button type="reset" class="btn btn-outline">Reset</button>
                                     </div>
                                 </form>

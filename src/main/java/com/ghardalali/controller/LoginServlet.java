@@ -7,7 +7,7 @@ import java.util.Map;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServlet;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -21,7 +21,7 @@ import com.ghardalali.util.ValidationUtil;
  * Servlet for handling user login
  */
 @WebServlet("/login")
-public class LoginServlet extends HttpServlet {
+public class LoginServlet extends BaseServlet {
     private static final long serialVersionUID = 1L;
     private UserService userService;
 

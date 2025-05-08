@@ -36,9 +36,10 @@
                                 </div>
                                 <div class="profile-header-content">
                                     <div class="profile-avatar">
-                                        <img src="${pageContext.request.contextPath}/images/property-placeholder.jpg"
+                                        <img src="${user.profileImagePath != null ? user.profileImagePath : pageContext.request.contextPath.concat('/images/users/default-profile.jpg')}"
                                             alt="Profile Image">
-                                        <button class="change-avatar-btn" title="Change Profile Picture">
+                                        <button type="button" class="change-avatar-btn" title="Change Profile Picture"
+                                            onclick="document.getElementById('profile-image-upload').style.display='block';">
                                             <i class="fas fa-camera"></i>
                                         </button>
                                     </div>
@@ -50,6 +51,36 @@
                                         <button id="edit-profile-btn" class="btn btn-primary">Edit Profile</button>
                                     </div>
                                 </div>
+                            </div>
+
+                            <!-- Profile Image Upload Form -->
+                            <div id="profile-image-upload"
+                                style="display: none; margin: 20px 0; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                                <form action="${pageContext.request.contextPath}/profile" method="post"
+                                    enctype="multipart/form-data">
+                                    <!-- CSRF Protection -->
+                                    <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
+                                    <input type="hidden" name="action" value="uploadProfileImage">
+
+                                    <h3>Upload Profile Picture</h3>
+
+                                    <div style="margin-bottom: 15px;">
+                                        <label for="profileImage"
+                                            style="display: block; margin-bottom: 5px; font-weight: 500;">Select
+                                            Image</label>
+                                        <input type="file" id="profileImage" name="profileImage" accept="image/*"
+                                            required
+                                            style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                        <small style="display: block; margin-top: 5px; color: #666;">Maximum file size:
+                                            5MB. Recommended size: 300x300 pixels.</small>
+                                    </div>
+
+                                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                                        <button type="button" class="btn btn-secondary"
+                                            onclick="document.getElementById('profile-image-upload').style.display='none';">Cancel</button>
+                                        <button type="submit" class="btn btn-primary">Upload</button>
+                                    </div>
+                                </form>
                             </div>
 
                             <!-- Success/Error Messages -->

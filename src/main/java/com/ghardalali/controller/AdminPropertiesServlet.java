@@ -2,24 +2,32 @@ package com.ghardalali.controller;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 
 import com.ghardalali.model.Property;
 import com.ghardalali.model.User;
 import com.ghardalali.service.PropertyService;
+import com.ghardalali.util.FileUploadUtil;
 import com.ghardalali.util.SessionUtil;
 
 /**
  * Servlet for handling admin properties management
  */
 @WebServlet("/admin/properties")
+@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, // 2MB
+        maxFileSize = 1024 * 1024 * 5, // 5MB
+        maxRequestSize = 1024 * 1024 * 20 // 20MB
+)
 public class AdminPropertiesServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
@@ -269,10 +277,164 @@ public class AdminPropertiesServlet extends HttpServlet {
                     property.setSizeUnit("sq.ft");
                 }
 
+                // Handle image uploads or URL
                 if (imagePath != null && !imagePath.trim().isEmpty()) {
+                    // If URL is provided, use it
                     property.setPrimaryImagePath(imagePath);
+                } else {
+                    // Check for file uploads
+                    try {
+                        // Get the uploaded files
+                        Part filePart1 = request.getPart("propertyImage1");
+                        Part filePart2 = request.getPart("propertyImage2");
+                        Part filePart3 = request.getPart("propertyImage3");
+                        Part filePart4 = request.getPart("propertyImage4");
+
+                        // List to store uploaded image paths
+                        List<String> uploadedImagePaths = new ArrayList<>();
+
+                        boolean success = false;
+                        Property savedProperty = null;
+
+                        if ("add".equals(action)) {
+                            // For new properties, we need to save the property first to get the ID
+                            // then upload images and update the property with image paths
+                            savedProperty = propertyService.createProperty(property);
+                            success = (savedProperty != null);
+
+                            if (!success) {
+                                request.setAttribute("errorMessage", "Failed to add property");
+                                request.setAttribute("user", user);
+                                request.setAttribute("activeTab", "properties");
+                                request.getRequestDispatcher("/admin-add-property.jsp").forward(request, response);
+                                return;
+                            }
+
+                            // Now we have the property ID, upload the images
+                            int newPropertyId = savedProperty.getPropertyId();
+
+                            // Upload primary image if provided
+                            if (filePart1 != null && filePart1.getSize() > 0) {
+                                String primaryImagePath = FileUploadUtil.uploadPropertyImage(request, "propertyImage1",
+                                        newPropertyId);
+                                if (primaryImagePath != null) {
+                                    // Set as primary and add to list
+                                    savedProperty.setPrimaryImagePath(primaryImagePath);
+                                    propertyService.addPropertyImage(newPropertyId, primaryImagePath, true);
+                                    uploadedImagePaths.add(primaryImagePath);
+                                }
+                            }
+
+                            // Upload additional images
+                            if (filePart2 != null && filePart2.getSize() > 0) {
+                                String imagePath2 = FileUploadUtil.uploadPropertyImage(request, "propertyImage2",
+                                        newPropertyId);
+                                if (imagePath2 != null) {
+                                    propertyService.addPropertyImage(newPropertyId, imagePath2, false);
+                                    uploadedImagePaths.add(imagePath2);
+                                }
+                            }
+
+                            if (filePart3 != null && filePart3.getSize() > 0) {
+                                String imagePath3 = FileUploadUtil.uploadPropertyImage(request, "propertyImage3",
+                                        newPropertyId);
+                                if (imagePath3 != null) {
+                                    propertyService.addPropertyImage(newPropertyId, imagePath3, false);
+                                    uploadedImagePaths.add(imagePath3);
+                                }
+                            }
+
+                            if (filePart4 != null && filePart4.getSize() > 0) {
+                                String imagePath4 = FileUploadUtil.uploadPropertyImage(request, "propertyImage4",
+                                        newPropertyId);
+                                if (imagePath4 != null) {
+                                    propertyService.addPropertyImage(newPropertyId, imagePath4, false);
+                                    uploadedImagePaths.add(imagePath4);
+                                }
+                            }
+
+                            // Update success message with image count
+                            session.setAttribute("successMessage",
+                                    "Property added successfully with " + uploadedImagePaths.size() + " image(s)");
+                        } else {
+                            // For existing properties, we already have the ID
+                            int existingPropertyId = property.getPropertyId();
+
+                            // Upload primary image if provided
+                            if (filePart1 != null && filePart1.getSize() > 0) {
+                                String primaryImagePath = FileUploadUtil.uploadPropertyImage(request, "propertyImage1",
+                                        existingPropertyId);
+                                if (primaryImagePath != null) {
+                                    // Set as primary and add to list
+                                    property.setPrimaryImagePath(primaryImagePath);
+                                    propertyService.addPropertyImage(existingPropertyId, primaryImagePath, true);
+                                    uploadedImagePaths.add(primaryImagePath);
+                                }
+                            }
+
+                            // Upload additional images
+                            if (filePart2 != null && filePart2.getSize() > 0) {
+                                String imagePath2 = FileUploadUtil.uploadPropertyImage(request, "propertyImage2",
+                                        existingPropertyId);
+                                if (imagePath2 != null) {
+                                    propertyService.addPropertyImage(existingPropertyId, imagePath2, false);
+                                    uploadedImagePaths.add(imagePath2);
+                                }
+                            }
+
+                            if (filePart3 != null && filePart3.getSize() > 0) {
+                                String imagePath3 = FileUploadUtil.uploadPropertyImage(request, "propertyImage3",
+                                        existingPropertyId);
+                                if (imagePath3 != null) {
+                                    propertyService.addPropertyImage(existingPropertyId, imagePath3, false);
+                                    uploadedImagePaths.add(imagePath3);
+                                }
+                            }
+
+                            if (filePart4 != null && filePart4.getSize() > 0) {
+                                String imagePath4 = FileUploadUtil.uploadPropertyImage(request, "propertyImage4",
+                                        existingPropertyId);
+                                if (imagePath4 != null) {
+                                    propertyService.addPropertyImage(existingPropertyId, imagePath4, false);
+                                    uploadedImagePaths.add(imagePath4);
+                                }
+                            }
+
+                            // Update the property
+                            success = propertyService.updateProperty(property);
+
+                            if (success) {
+                                // Update success message with image count
+                                session.setAttribute("successMessage",
+                                        "Property updated successfully with " + uploadedImagePaths.size()
+                                                + " new image(s)");
+                            } else {
+                                request.setAttribute("errorMessage", "Failed to update property");
+                                request.setAttribute("user", user);
+                                request.setAttribute("property", property);
+                                request.setAttribute("activeTab", "properties");
+                                request.getRequestDispatcher("/admin-edit-property.jsp").forward(request, response);
+                                return;
+                            }
+                        }
+
+                        // Redirect back to properties list
+                        response.sendRedirect(request.getContextPath() + "/admin/properties");
+                        return;
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        request.setAttribute("errorMessage", "Error processing image uploads: " + e.getMessage());
+                        request.setAttribute("user", user);
+                        request.setAttribute("activeTab", "properties");
+                        request.getRequestDispatcher(
+                                "add".equals(action) ? "/admin-add-property.jsp" : "/admin-edit-property.jsp")
+                                .forward(request, response);
+                        return;
+                    }
                 }
 
+                // If we get here, no images were uploaded, just handle the text fields
                 boolean success = false;
                 if ("add".equals(action)) {
                     // Save new property to database

@@ -139,12 +139,8 @@ public class UserDAO {
                 // Get the stored password
                 String storedPassword = rs.getString("password");
 
-                System.out.println("Authenticating user: " + email);
-                System.out.println("Stored password: " + (storedPassword != null ? "******" : "null"));
-                System.out.println("Input password: " + (password != null ? "******" : "null"));
-
-                // For testing purposes, allow direct comparison with plain text passwords
-                boolean passwordMatches = password.equals(storedPassword);
+                // Use PasswordUtil to verify the password
+                boolean passwordMatches = com.ghardalali.util.PasswordUtil.verifyPassword(password, storedPassword);
 
                 if (passwordMatches) {
                     User user = new User();
@@ -211,6 +207,7 @@ public class UserDAO {
                 user.setEmail(rs.getString("email"));
                 user.setContactNumber(rs.getString("contact_number"));
                 user.setAddress(rs.getString("address"));
+                user.setProfileImagePath(rs.getString("profile_image_path"));
                 user.setUserRole(rs.getString("user_role"));
                 user.setCreatedAt(rs.getTimestamp("created_at"));
                 user.setUpdatedAt(rs.getTimestamp("updated_at"));
@@ -473,6 +470,10 @@ public class UserDAO {
 
         try {
             conn = DBUtil.getConnection();
+            if (conn == null) {
+                return users;
+            }
+
             pstmt = conn.prepareStatement(sql);
             rs = pstmt.executeQuery();
 
@@ -484,6 +485,14 @@ public class UserDAO {
                 user.setEmail(rs.getString("email"));
                 user.setContactNumber(rs.getString("contact_number"));
                 user.setAddress(rs.getString("address"));
+
+                // Check if profile_image_path column exists
+                try {
+                    user.setProfileImagePath(rs.getString("profile_image_path"));
+                } catch (SQLException e) {
+                    user.setProfileImagePath("images/users/default-profile.jpg");
+                }
+
                 user.setUserRole(rs.getString("user_role"));
                 user.setCreatedAt(rs.getTimestamp("created_at"));
                 user.setUpdatedAt(rs.getTimestamp("updated_at"));
@@ -550,7 +559,7 @@ public class UserDAO {
      * @return true if update successful, false otherwise
      */
     public boolean updateUserProfile(User user) {
-        String sql = "UPDATE users SET first_name = ?, last_name = ?, contact_number = ?, address = ? WHERE user_id = ?";
+        String sql = "UPDATE users SET first_name = ?, last_name = ?, contact_number = ?, address = ?, profile_image_path = ? WHERE user_id = ?";
         Connection conn = null;
         PreparedStatement pstmt = null;
 
@@ -562,7 +571,45 @@ public class UserDAO {
             pstmt.setString(2, user.getLastName());
             pstmt.setString(3, user.getContactNumber());
             pstmt.setString(4, user.getAddress());
-            pstmt.setInt(5, user.getUserId());
+            pstmt.setString(5, user.getProfileImagePath());
+            pstmt.setInt(6, user.getUserId());
+
+            int affectedRows = pstmt.executeUpdate();
+
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (pstmt != null)
+                    pstmt.close();
+                if (conn != null)
+                    DBUtil.closeConnection(conn);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Update user profile image
+     *
+     * @param userId           User ID
+     * @param profileImagePath Path to the profile image
+     * @return true if update successful, false otherwise
+     */
+    public boolean updateProfileImage(int userId, String profileImagePath) {
+        String sql = "UPDATE users SET profile_image_path = ? WHERE user_id = ?";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+
+        try {
+            conn = DBUtil.getConnection();
+            pstmt = conn.prepareStatement(sql);
+
+            pstmt.setString(1, profileImagePath);
+            pstmt.setInt(2, userId);
 
             int affectedRows = pstmt.executeUpdate();
 

@@ -4,7 +4,8 @@
         <div class="dashboard-sidebar">
             <div class="user-info">
                 <div class="user-avatar">
-                    <img src="${pageContext.request.contextPath}/images/property-placeholder.jpg" alt="User Avatar">
+                    <img src="${user.profileImagePath != null ? user.profileImagePath : pageContext.request.contextPath.concat('/images/users/default-profile.jpg')}"
+                        alt="User Avatar">
                 </div>
                 <div class="user-details">
                     <h3>${user.fullName}</h3>

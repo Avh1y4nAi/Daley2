@@ -1,5 +1,7 @@
 package com.ghardalali.service;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -149,5 +151,76 @@ public class PropertyService {
      */
     public boolean updateProperty(Property property) {
         return propertyDAO.updateProperty(property);
+    }
+
+    /**
+     * Gets the main image for a property
+     * 
+     * @param propertyId The property ID
+     * @return The URL of the main image
+     */
+    public String getMainImage(int propertyId) {
+        Property property = getPropertyById(propertyId);
+        if (property != null && property.getPrimaryImagePath() != null) {
+            return property.getPrimaryImagePath();
+        } else if (property != null && property.getImagePaths() != null && !property.getImagePaths().isEmpty()) {
+            return property.getImagePaths().get(0);
+        }
+        return "/images/properties/default.jpg"; // Default image
+    }
+
+    /**
+     * Gets all images for a property
+     * 
+     * @param propertyId The property ID
+     * @return List of image URLs
+     */
+    public List<String> getAllImages(int propertyId) {
+        Property property = getPropertyById(propertyId);
+        if (property != null && property.getImagePaths() != null && !property.getImagePaths().isEmpty()) {
+            return property.getImagePaths();
+        }
+        return Collections.singletonList("/images/properties/default.jpg"); // Default image
+    }
+
+    /**
+     * Sets the primary image for a property
+     * 
+     * @param propertyId The property ID
+     * @param imagePath  The image path to set as primary
+     * @return true if successful, false otherwise
+     */
+    public boolean setPrimaryImage(int propertyId, String imagePath) {
+        Property property = getPropertyById(propertyId);
+        if (property != null) {
+            // Check if the image exists in the property's images
+            if (property.getImagePaths().contains(imagePath)) {
+                // Update the primary image in the database
+                boolean success = propertyDAO.updatePrimaryImage(propertyId, imagePath);
+                if (success) {
+                    property.setPrimaryImagePath(imagePath);
+                }
+                return success;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Gets the property gallery data for display
+     * 
+     * @param propertyId The property ID
+     * @return Map containing mainImage and allImages
+     */
+    public Map<String, Object> getPropertyGalleryData(int propertyId) {
+        Map<String, Object> galleryData = new HashMap<>();
+
+        String mainImage = getMainImage(propertyId);
+        List<String> allImages = getAllImages(propertyId);
+
+        galleryData.put("mainImage", mainImage);
+        galleryData.put("allImages", allImages);
+
+        return galleryData;
     }
 }

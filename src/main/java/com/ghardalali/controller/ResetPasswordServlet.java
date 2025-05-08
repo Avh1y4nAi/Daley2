@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -17,7 +17,7 @@ import com.ghardalali.util.ValidationUtil;
  * Servlet for handling password reset confirmation
  */
 @WebServlet("/reset-password")
-public class ResetPasswordServlet extends HttpServlet {
+public class ResetPasswordServlet extends BaseServlet {
     private static final long serialVersionUID = 1L;
     private UserService userService;
 

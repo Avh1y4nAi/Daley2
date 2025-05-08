@@ -103,7 +103,10 @@
                                                     <p>${review.reviewText}</p>
                                                 </div>
                                                 <div class="review-actions">
-                                                    <button class="btn btn-sm">Edit</button>
+                                                    <button class="btn btn-sm edit-review-btn"
+                                                        data-review-id="${review.reviewId}"
+                                                        data-rating="${review.rating}"
+                                                        data-review-text="${review.reviewText}">Edit</button>
                                                     <form action="${pageContext.request.contextPath}/dashboard/reviews"
                                                         method="post" style="display: inline;">
                                                         <input type="hidden" name="action" value="delete">
@@ -124,7 +127,85 @@
 
             <jsp:include page="footer.jsp" />
 
+            <!-- Edit Review Modal -->
+            <div id="editReviewModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2>Edit Review</h2>
+                    <form id="editReviewForm" action="${pageContext.request.contextPath}/dashboard/reviews"
+                        method="post">
+                        <input type="hidden" name="action" value="edit">
+                        <input type="hidden" id="editReviewId" name="reviewId" value="">
+
+                        <div class="form-group">
+                            <label for="editRating">Rating</label>
+                            <select id="editRating" name="rating" required>
+                                <option value="5">5 Stars</option>
+                                <option value="4">4 Stars</option>
+                                <option value="3">3 Stars</option>
+                                <option value="2">2 Stars</option>
+                                <option value="1">1 Star</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editReviewText">Review</label>
+                            <textarea id="editReviewText" name="reviewText" rows="5" required></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="cancelEditBtn">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <script src="${pageContext.request.contextPath}/js/main.js"></script>
+            <script>
+                // Get the modal
+                var modal = document.getElementById("editReviewModal");
+
+                // Get the <span> element that closes the modal
+                var span = document.getElementsByClassName("close")[0];
+
+                // Get the cancel button
+                var cancelBtn = document.getElementById("cancelEditBtn");
+
+                // When the user clicks on <span> (x) or cancel, close the modal
+                span.onclick = function () {
+                    modal.style.display = "none";
+                }
+
+                cancelBtn.onclick = function () {
+                    modal.style.display = "none";
+                }
+
+                // When the user clicks anywhere outside of the modal, close it
+                window.onclick = function (event) {
+                    if (event.target == modal) {
+                        modal.style.display = "none";
+                    }
+                }
+
+                // Add event listeners to all edit buttons
+                document.addEventListener('DOMContentLoaded', function () {
+                    var editButtons = document.querySelectorAll('.edit-review-btn');
+                    editButtons.forEach(function (button) {
+                        button.addEventListener('click', function () {
+                            var reviewId = this.getAttribute('data-review-id');
+                            var rating = this.getAttribute('data-rating');
+                            var reviewText = this.getAttribute('data-review-text');
+
+                            document.getElementById("editReviewId").value = reviewId;
+                            document.getElementById("editRating").value = rating;
+                            document.getElementById("editReviewText").value = reviewText;
+
+                            modal.style.display = "block";
+                        });
+                    });
+                });
+            </script>
         </body>
 
         </html>

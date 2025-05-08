@@ -6,7 +6,7 @@ import java.util.List;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -17,7 +17,7 @@ import com.ghardalali.model.User;
  * Servlet for handling admin payments management
  */
 @WebServlet("/admin/payments")
-public class AdminPaymentsServlet extends HttpServlet {
+public class AdminPaymentsServlet extends BaseServlet {
     private static final long serialVersionUID = 1L;
 
     @Override

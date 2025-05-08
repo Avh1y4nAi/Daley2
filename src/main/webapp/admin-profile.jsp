@@ -52,9 +52,11 @@
 
                                     <div class="profile-overview">
                                         <div class="profile-avatar-large">
-                                            <img src="${pageContext.request.contextPath}/images/property-placeholder.jpg"
+                                            <img src="${user.profileImagePath != null ? user.profileImagePath : pageContext.request.contextPath.concat('/images/users/default-profile.jpg')}"
                                                 alt="Profile Avatar">
-                                            <button class="change-avatar-btn" title="Change Profile Picture">
+                                            <button type="button" class="change-avatar-btn"
+                                                title="Change Profile Picture"
+                                                onclick="document.getElementById('profile-image-upload').style.display='block';">
                                                 <i class="fas fa-camera"></i>
                                             </button>
                                         </div>
@@ -66,6 +68,31 @@
                                             <p><i class="fas fa-calendar-alt"></i> Member since ${user.createdAt}</p>
                                             <p><i class="fas fa-user-shield"></i> Role: Administrator</p>
                                         </div>
+                                    </div>
+
+                                    <!-- Profile Image Upload Form -->
+                                    <div id="profile-image-upload" style="display: none; margin-bottom: 20px;">
+                                        <form action="${pageContext.request.contextPath}/admin/profile" method="post"
+                                            enctype="multipart/form-data" class="property-form">
+                                            <!-- CSRF Protection -->
+                                            <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
+                                            <input type="hidden" name="action" value="uploadProfileImage">
+
+                                            <h3>Upload Profile Picture</h3>
+
+                                            <div class="form-group">
+                                                <label for="profileImage">Select Image</label>
+                                                <input type="file" id="profileImage" name="profileImage"
+                                                    accept="image/*" required>
+                                                <small>Maximum file size: 5MB. Recommended size: 300x300 pixels.</small>
+                                            </div>
+
+                                            <div class="form-actions">
+                                                <button type="submit" class="btn btn-primary">Upload</button>
+                                                <button type="button" class="btn btn-secondary"
+                                                    onclick="document.getElementById('profile-image-upload').style.display='none';">Cancel</button>
+                                            </div>
+                                        </form>
                                     </div>
 
                                     <form id="profile-form" class="property-form"

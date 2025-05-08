@@ -13,6 +13,7 @@ public class User {
     private String password;
     private String contactNumber;
     private String address;
+    private String profileImagePath;
     private String userRole;
     private Timestamp createdAt;
     private Timestamp updatedAt;
@@ -31,7 +32,8 @@ public class User {
 
     // Full constructor
     public User(int userId, String firstName, String lastName, String email, String password,
-            String contactNumber, String address, String userRole, Timestamp createdAt, Timestamp updatedAt) {
+            String contactNumber, String address, String profileImagePath, String userRole,
+            Timestamp createdAt, Timestamp updatedAt) {
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -39,6 +41,7 @@ public class User {
         this.password = password;
         this.contactNumber = contactNumber;
         this.address = address;
+        this.profileImagePath = profileImagePath;
         this.userRole = userRole;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -101,6 +104,14 @@ public class User {
         this.address = address;
     }
 
+    public String getProfileImagePath() {
+        return profileImagePath;
+    }
+
+    public void setProfileImagePath(String profileImagePath) {
+        this.profileImagePath = profileImagePath;
+    }
+
     public String getUserRole() {
         return userRole;
     }
@@ -143,6 +154,7 @@ public class User {
                 ", password=" + (password != null ? "******" : "null") +
                 ", contactNumber=" + contactNumber +
                 ", address=" + address +
+                ", profileImagePath=" + profileImagePath +
                 ", userRole=" + userRole +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt + "]";

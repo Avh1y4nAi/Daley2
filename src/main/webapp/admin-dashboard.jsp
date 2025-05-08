@@ -42,9 +42,9 @@
                                             <i class="fas fa-users"></i>
                                         </div>
                                         <h3>Total Users</h3>
-                                        <p class="stat-value">3</p>
+                                        <p class="stat-value">${totalUsers}</p>
                                         <p class="stat-change positive">
-                                            <i class="fas fa-arrow-up"></i> 10% from last month
+                                            <i class="fas fa-arrow-up"></i> Active users
                                         </p>
                                     </div>
                                     <div class="stat-card">
@@ -52,9 +52,9 @@
                                             <i class="fas fa-home"></i>
                                         </div>
                                         <h3>Total Properties</h3>
-                                        <p class="stat-value">3</p>
+                                        <p class="stat-value">${totalProperties}</p>
                                         <p class="stat-change positive">
-                                            <i class="fas fa-arrow-up"></i> 5% from last month
+                                            <i class="fas fa-arrow-up"></i> Listed properties
                                         </p>
                                     </div>
                                     <div class="stat-card">
@@ -62,9 +62,16 @@
                                             <i class="fas fa-file-alt"></i>
                                         </div>
                                         <h3>Total Applications</h3>
-                                        <p class="stat-value">0</p>
+                                        <p class="stat-value">${totalApplications}</p>
                                         <p class="stat-change">
-                                            No change from last month
+                                            <c:choose>
+                                                <c:when test="${totalApplications > 0}">
+                                                    <i class="fas fa-arrow-up"></i> Active applications
+                                                </c:when>
+                                                <c:otherwise>
+                                                    No applications yet
+                                                </c:otherwise>
+                                            </c:choose>
                                         </p>
                                     </div>
                                     <div class="stat-card">
@@ -72,9 +79,16 @@
                                             <i class="fas fa-star"></i>
                                         </div>
                                         <h3>Total Reviews</h3>
-                                        <p class="stat-value">0</p>
+                                        <p class="stat-value">${totalReviews}</p>
                                         <p class="stat-change">
-                                            No change from last month
+                                            <c:choose>
+                                                <c:when test="${totalReviews > 0}">
+                                                    <i class="fas fa-arrow-up"></i> User reviews
+                                                </c:when>
+                                                <c:otherwise>
+                                                    No reviews yet
+                                                </c:otherwise>
+                                            </c:choose>
                                         </p>
                                     </div>
                                 </div>

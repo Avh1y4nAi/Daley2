@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -18,7 +18,7 @@ import com.ghardalali.util.ValidationUtil;
  * Servlet for handling password change
  */
 @WebServlet("/profile/change-password")
-public class PasswordChangeServlet extends HttpServlet {
+public class PasswordChangeServlet extends BaseServlet {
     private static final long serialVersionUID = 1L;
 
     private UserService userService;

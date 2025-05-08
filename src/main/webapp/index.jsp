@@ -45,7 +45,7 @@
                     <div class="search-container">
                         <form class="search-form" action="${pageContext.request.contextPath}/properties" method="get">
                             <input type="text" name="search-keyword" placeholder="Search for properties...">
-                            <button type="submit" class="btn btn-primary">
+                            <button type="submit" class="btn btn-primary" style="border-radius: 0.7rem !important;">
                                 Search
                             </button>
                         </form>

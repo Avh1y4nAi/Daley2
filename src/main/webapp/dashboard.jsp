@@ -78,15 +78,15 @@
                                             <div class="dashboard-stats">
                                                 <div class="stat-card">
                                                     <h4>Saved Properties</h4>
-                                                    <p>0</p>
+                                                    <p>${savedPropertiesCount}</p>
                                                 </div>
                                                 <div class="stat-card">
                                                     <h4>Applications</h4>
-                                                    <p>0</p>
+                                                    <p>${applicationsCount}</p>
                                                 </div>
                                                 <div class="stat-card">
                                                     <h4>Reviews</h4>
-                                                    <p>0</p>
+                                                    <p>${reviewsCount}</p>
                                                 </div>
                                             </div>
                                         </div>

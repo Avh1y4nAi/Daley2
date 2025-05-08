@@ -635,4 +635,48 @@ public class PropertyDAO {
             }
         }
     }
+
+    /**
+     * Update the primary image for a property
+     *
+     * @param propertyId Property ID
+     * @param imagePath  Path to the image to set as primary
+     * @return true if successful, false otherwise
+     */
+    public boolean updatePrimaryImage(int propertyId, String imagePath) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+
+        try {
+            conn = DBUtil.getConnection();
+
+            // First, remove primary flag from all images
+            String updateAllSql = "UPDATE property_images SET is_primary = false WHERE property_id = ?";
+            pstmt = conn.prepareStatement(updateAllSql);
+            pstmt.setInt(1, propertyId);
+            pstmt.executeUpdate();
+            pstmt.close();
+
+            // Then, set the specified image as primary
+            String setPrimarySql = "UPDATE property_images SET is_primary = true WHERE property_id = ? AND image_path = ?";
+            pstmt = conn.prepareStatement(setPrimarySql);
+            pstmt.setInt(1, propertyId);
+            pstmt.setString(2, imagePath);
+            int rowsAffected = pstmt.executeUpdate();
+
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (pstmt != null)
+                    pstmt.close();
+                if (conn != null)
+                    DBUtil.closeConnection(conn);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
